@@ -1,0 +1,55 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+// Function to compute the FIR filter coefficients
+std::vector<double> firwin(int N, double fc, double fs) {
+    std::vector<double> b(N);
+    for (int n = 0; n < N; ++n) {
+        if (n == (N-1)/2) {
+            b[n] = 2 * fc / fs;
+        } else {
+            b[n] = sin(2 * M_PI * fc * (n - (N-1)/2) / fs) / (M_PI * (n - (N-1)/2));
+        }
+    }
+    return b;
+}
+
+// Function to apply the FIR filter to an input signal
+std::vector<double> filter(const std::vector<double>& input_signal, const std::vector<double>& b) {
+    int N = b.size();
+    int M = input_signal.size();
+    std::vector<double> filtered_signal(M);
+
+    for (int n = 0; n < M; ++n) {
+        filtered_signal[n] = 0;
+        for (int k = 0; k < N; ++k) {
+            if (n - k >= 0) {
+                filtered_signal[n] += b[k] * input_signal[n - k];
+            }
+        }
+    }
+
+    return filtered_signal;
+}
+
+int main() {
+    // Define filter parameters
+    int fs = 1000;   // Sampling frequency
+    double fc = 100; // Cutoff frequency
+    int N = 51;      // Filter length (odd for symmetry)
+
+    // Design FIR filter
+    std::vector<double> b = firwin(N, fc, fs);
+
+    // Apply filter to input signal
+    std::vector<double> input_signal = {your input signal here};
+    std::vector<double> filtered_signal = filter(input_signal, b);
+
+    // Display filtered signal or further processing
+    for (double value : filtered_signal) {
+        std::cout << value << std::endl;
+    }
+
+    return 0;
+}
